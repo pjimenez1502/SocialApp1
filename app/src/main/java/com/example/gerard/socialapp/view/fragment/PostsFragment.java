@@ -14,6 +14,7 @@ import com.example.gerard.socialapp.R;
 import com.example.gerard.socialapp.model.Post;
 import com.example.gerard.socialapp.view.PostViewHolder;
 import com.example.gerard.socialapp.view.activity.MediaActivity;
+import com.example.gerard.socialapp.view.activity.PostDetailsActivity;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -101,6 +102,16 @@ public class PostsFragment extends Fragment {
                         }
                     }
                 });
+
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getActivity(), PostDetailsActivity.class);
+                    intent.putExtra("POST", postKey);
+                    startActivity(intent);
+                }
+            });
+
             }
         });
 
