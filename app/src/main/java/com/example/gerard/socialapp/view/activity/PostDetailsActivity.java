@@ -5,9 +5,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -19,6 +21,7 @@ import com.example.gerard.socialapp.GlideApp;
 import com.example.gerard.socialapp.R;
 import com.example.gerard.socialapp.model.Post;
 import com.example.gerard.socialapp.model.PostComment;
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -90,12 +93,25 @@ public class PostDetailsActivity extends AppCompatActivity {
 
         //Rellenar el recycler con los comments
 
-        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<Post>()
-                .setIndexedQuery(setQuery(), mReference.child("posts/data"), Post.class)
+        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<PostComment>()
+                .setIndexedQuery(setQuery(postkey), database.child("posts/data/"+ postkey+ "/comments"), PostComment.class)
                 .setLifecycleOwner(this)
                 .build();
-        RecyclerView commRecycler = findViewById(R.id.comment_recycler);
 
+        RecyclerView commRecycler = findViewById(R.id.comment_recycler);
+        commRecycler.setLayoutManager(new LinearLayoutManager(this));
+        commRecycler.setAdapter(new FirebaseRecyclerAdapter() {
+            @Override
+            protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull Object model) {
+
+            }
+
+            @NonNull
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                return null;
+            }
+        });
 
 
     }
@@ -165,8 +181,8 @@ public class PostDetailsActivity extends AppCompatActivity {
 
     }
 
-    Query setQuery(){
-        return  database.child("posts/all-posts").limitToFirst(100);
+    Query setQuery(String postkey){
+        return  database.child("posts/data/"+ postkey+ "/comments/").limitToFirst(100);
     }
 
 }

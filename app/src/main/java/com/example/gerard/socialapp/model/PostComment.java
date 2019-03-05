@@ -13,6 +13,8 @@ public class PostComment {
 
     public Map<String, Boolean> likes = new HashMap<>();
 
+    public PostComment(){}
+
     public PostComment(String uid, String author, String authorPhotoUrl, String content) {
         this.uid = uid;
         this.author = author;
