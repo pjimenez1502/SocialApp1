@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -17,10 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
 import com.example.gerard.socialapp.GlideApp;
 import com.example.gerard.socialapp.R;
 import com.example.gerard.socialapp.model.Post;
 import com.example.gerard.socialapp.model.PostComment;
+import com.example.gerard.socialapp.view.CommentViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -100,17 +103,21 @@ public class PostDetailsActivity extends AppCompatActivity {
 
         RecyclerView commRecycler = findViewById(R.id.comment_recycler);
         commRecycler.setLayoutManager(new LinearLayoutManager(this));
-        commRecycler.setAdapter(new FirebaseRecyclerAdapter() {
+        commRecycler.setAdapter(new FirebaseRecyclerAdapter<PostComment, CommentViewHolder>(options) {
             @Override
-            protected void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull Object model) {
+            public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
+                return new CommentViewHolder(inflater.inflate(R.layout.item_comment, viewGroup, false));
+            }
+            @Override
+            protected void onBindViewHolder(final CommentViewHolder holder, int position, final PostComment comment) {
+                final String comKey = getRef(position).getKey();
 
+                holder.author.setText(comment.author);
+                GlideApp.with(PostDetailsActivity.this).load(comment.authorPhotoUrl).circleCrop().into(holder.photo);
+                holder.content.setText(comment.content);
             }
 
-            @NonNull
-            @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-                return null;
-            }
         });
 
 
@@ -155,21 +162,18 @@ public class PostDetailsActivity extends AppCompatActivity {
                 GlideApp.with(getBaseContext()).load(post.authorPhotoUrl).circleCrop().into(photo);
                 author.setText(post.author);
                 content.setText(post.content);
+
+                videoView.setVisibility(View.GONE);
+                image.setVisibility(View.GONE);
                 if (post.mediaType != null) {
                     if (post.mediaType.equals("image")) {
-                        videoView.setVisibility(View.GONE);
                         image.setVisibility(View.VISIBLE);
                         GlideApp.with(getBaseContext()).load(post.mediaUrl).into(image);
                     } else if (post.mediaType.equals("video")) {
                         videoView.setVisibility(View.VISIBLE);
-                        image.setVisibility(View.GONE);
                         videoView.setVideoPath(post.mediaUrl);
                         videoView.start();
-
                     }
-                }else{
-                    videoView.setVisibility(View.GONE);
-                    image.setVisibility(View.GONE);
                 }
             }
 
